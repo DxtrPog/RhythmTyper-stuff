@@ -10,6 +10,8 @@ const songAuthorEl = document.getElementById('songAuthor')
 const chartMapperEl = document.getElementById('chartMapper')
 const starRatingBadge = document.getElementById('starRatingBadge')
 const ppValue = document.getElementById("ppValue")
+const playButton = document.getElementById("playButton")
+const songAudio = document.getElementById("songAudio")
 
 // Inputs
 const perfectInput = document.getElementById('perfect')
@@ -589,6 +591,29 @@ function setMod(mod) {
     updateStarRating(mod)
 }
 
+function playAudio() {
+    if (!mapData || !mapData.files) return
+
+    const audioFile = mapData.files.find(f => f.name.toLowerCase().startsWith('audio') && f.type === 'binary')
+    if (!audioFile) {
+        alert("No audio file found")
+        return
+    }
+
+    if (songAudio.paused) {
+        const audioBlob = new Blob([audioFile.content], { type: 'audio/*' })
+        const audioUrl = URL.createObjectURL(audioBlob)
+        songAudio.src = audioUrl
+        songAudio.play()
+        document.getElementById('playIcon').classList.add('hidden')
+        document.getElementById('pauseIcon').classList.remove('hidden')
+    } else {
+        songAudio.pause()
+        document.getElementById('playIcon').classList.remove('hidden')
+        document.getElementById('pauseIcon').classList.add('hidden')
+    }
+}
+
 modNoneBtn.addEventListener('click', () => setMod('none'))
 modNCBtn.addEventListener('click', () => setMod('nc'))
 modHTBtn.addEventListener('click', () => setMod('ht'))
@@ -598,3 +623,10 @@ goodInput.addEventListener('input', updateResults)
 okInput.addEventListener('input', updateResults)
 missInput.addEventListener('input', updateResults)
 comboInput.addEventListener('input', updateResults)
+
+playButton.addEventListener('click', playAudio)
+
+songAudio.addEventListener('ended', () => {
+    document.getElementById('playIcon').classList.remove('hidden')
+    document.getElementById('pauseIcon').classList.add('hidden')
+})
